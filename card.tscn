@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://ctsue3ln4sttu"]
+
+[ext_resource type="Texture2D" uid="uid://sqc5iihq5a2" path="res://assets/photo_2025-09-27_19-24-55.jpg" id="1_kikvd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5kg04"]
+size = Vector2(264, 419)
+
+[node name="card" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(2, -1)
+texture = ExtResource("1_kikvd")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(3, -2)
+shape = SubResource("RectangleShape2D_5kg04")
