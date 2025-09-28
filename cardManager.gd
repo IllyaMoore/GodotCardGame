@@ -1,25 +1,21 @@
 extends Node2D
 
-#card deck
 var cards = []
-
-var cards_position = {
-	0: Vector2(-500, 500),
-	1: Vector2(-250, 500),
-	2: Vector2(0, 500),
-	3: Vector2(250, 500),
-	4: Vector2(500, 500),
-}
-
+var speed = 8000
 var dragging_card = null
 
-# cards start up position
+var cards_position = {
+	"card0": Vector2(-500, 500),
+	"card1": Vector2(-250, 500),
+	"card2": Vector2(0, 500),
+	"card3": Vector2(250, 500),
+	"card4": Vector2(500, 500),
+}
+
 func _ready():
 	cards = [$card0, $card1, $card2, $card3, $card4]
-	
-	for i in range(cards.size()):
-		cards[i].position = cards_position[i]
-		
+	for card in cards:
+		card.position = cards_position[card.name]
 
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -29,17 +25,23 @@ func _input(event):
 		else:
 			dragging_card = null
 
-func _on_Button_mouse_entered():
-	print("Миша зайшла на ноду:", self.name)
-	
+func _physics_process(delta):
+	if dragging_card == null:
+		return_card(delta)
 
-# card moovement
+func return_card(delta):
+	for card in cards:
+		var target = cards_position[card.name]
+		var direction = (target - card.global_position).normalized()
+		var distance = card.global_position.distance_to(target)
+		var max_speed = distance / delta
+		var velocity = direction * min(speed, max_speed)
+		card.global_position += velocity * delta
+
 func _process(_delta):
-	
 	if dragging_card != null:
-		get_card_under_mouse().position = get_global_mouse_position()
+		dragging_card.global_position = get_global_mouse_position()
 
-	
 func get_card_under_mouse():
 	var mouse_pos = get_global_mouse_position()
 	var space_state = get_world_2d().direct_space_state
@@ -53,8 +55,9 @@ func get_card_under_mouse():
 	var result = space_state.intersect_point(params)
 
 	for hit in result:
-		var collider = hit["collider"]
-		var card = collider.get_parent()
-		if card.name.begins_with("card"):
-			return card
+		var collider = hit.get("collider")
+		if collider:
+			var card = collider.get_parent()
+			if card and card.name.begins_with("card"):
+				return card
 	return null
